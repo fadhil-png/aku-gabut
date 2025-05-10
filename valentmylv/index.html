@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Valen💖</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <br>
+  <div class="container" role="main">
+    <br><br><br>
+    <h1 class="title">Fadhil & Valent </h1>
+
+    <form id="loginForm" aria-label="Login form">
+      <label for="loginUsername">Username</label>
+      <input type="text" id="loginUsername" autocomplete="username" placeholder="Masukkan username" required aria-required="true" />
+      <label for="loginPassword">Password</label>
+      <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Masukkan password" required aria-required="true" />
+      <button type="submit" aria-label="Login">Login</button>
+      <div id="loginErrorMsg" class="error-message" role="alert" aria-live="assertive"></div>
+      <div tabindex="0" role="button" class="toggle-link" id="showRegister" aria-label="Beralih ke pendaftaran">Belum punya akun? Daftar di sini</div>
+    </form>
+
+    <form id="registerForm" aria-label="Registration form" style="display:none;">
+      <label for="registerUsername">Username Baru</label>
+      <input type="text" id="registerUsername" placeholder="Buat username" required aria-required="true" />
+      <label for="registerPassword">Password Baru</label>
+      <input type="password" id="registerPassword" placeholder="Buat password" required aria-required="true" />
+      <label for="registerPasswordConfirm">Konfirmasi Password</label>
+      <input type="password" id="registerPasswordConfirm" placeholder="Ulangi password" required aria-required="true" />
+      <button type="submit" aria-label="Register">Daftar</button>
+      <div id="registerErrorMsg" class="error-message" role="alert" aria-live="assertive"></div>
+      <div tabindex="0" role="button" class="toggle-link" id="showLogin" aria-label="Beralih ke login">Sudah punya akun? Masuk di sini</div>
+    </form>
+
+    <section id="dashboard" class="dashboard" aria-live="polite" aria-label="Dashboard">
+      <div class="welcome-msg" id="welcomeMsg"></div>
+      <div class="photos-container" aria-label="Photo templates">
+        <div class="photo-frame" tabindex="0">
+          <img src="image/foto1.jpg" alt="Pasangan berjalan berpegangan tangan" loading="lazy" />
+        </div>
+        <div class="photo-frame" tabindex="0">
+          <img src="image/foto2.jpg" alt="Cangkir kopi dan tulisan cinta" loading="lazy" />
+        </div>
+        <div class="photo-frame" tabindex="0">
+          <img src="image/foto3.jpg" alt="Pemandangan sunset romantis" loading="lazy" />
+        </div>
+        <div class="photo-frame" tabindex="0">
+          <img src="image/foto4.jpg" alt="Dua tangan membentuk hati" loading="lazy" />
+        </div>
+        <div class="photo-frame" tabindex="0">
+          <img src="image/WhatsApp Image 2025-05-09 at 08.17.56_1723c385.jpg" alt="Buket bunga mawar merah" loading="lazy" />
+        </div>
+      </div>
+      <button id="logoutBtn" class="logout-btn" aria-label="Logout">Logout</button>
+      <footer>© 2025 Web Fadhil dengan Valent</footer>
+    </section>
+  </div>
+
+<script>
+  (() => {
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const dashboard = document.getElementById('dashboard');
+    const welcomeMsg = document.getElementById('welcomeMsg');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    const loginErrorMsg = document.getElementById('loginErrorMsg');
+    const registerErrorMsg = document.getElementById('registerErrorMsg');
+
+    const showRegisterLink = document.getElementById('showRegister');
+    const showLoginLink = document.getElementById('showLogin');
+
+    // Helper: Retrieve users from localStorage
+    function getUsers() {
+      const usersJson = localStorage.getItem('bucinUsers');
+      return usersJson ? JSON.parse(usersJson) : {};
+    }
+    // Helper: Save users to localStorage
+    function saveUsers(users) {
+      localStorage.setItem('bucinUsers', JSON.stringify(users));
+    }
+
+    // Show dashboard with welcome message
+    function showDashboard(username) {
+      loginForm.style.display = "none";
+      registerForm.style.display = "none";
+      dashboard.style.display = "flex";
+      welcomeMsg.textContent = `Selamat datang, ${username}! Sayang selalu. 💕`;
+      loginErrorMsg.textContent = "";
+      registerErrorMsg.textContent = "";
+      logoutBtn.focus();
+    }
+
+    // Show login form
+    function showLogin() {
+      loginForm.style.display = "flex";
+      registerForm.style.display = "none";
+      dashboard.style.display = "none";
+      loginErrorMsg.textContent = "";
+      registerErrorMsg.textContent = "";
+      loginForm.loginUsername.focus();
+    }
+
+    // Show register form
+    function showRegister() {
+      loginForm.style.display = "none";
+      registerForm.style.display = "flex";
+      dashboard.style.display = "none";
+      loginErrorMsg.textContent = "";
+      registerErrorMsg.textContent = "";
+      registerForm.registerUsername.focus();
+    }
+
+    // Validate password strength (simple example)
+    function isPasswordStrong(pw) {
+      return pw.length >= 6;
+    }
+
+    // On page load: check session
+    const loggedUser = sessionStorage.getItem("bucinUser");
+    if (loggedUser) {
+      showDashboard(loggedUser);
+    } else {
+      showLogin();
+    }
+
+    // Event: toggle to registration form
+    showRegisterLink.addEventListener("click", showRegister);
+    showRegisterLink.addEventListener("keypress", e => {
+      if (e.key === "Enter" || e.key === " ") {
+        showRegister();
+        e.preventDefault();
+      }
+    });
+
+    // Event: toggle to login form
+    showLoginLink.addEventListener("click", showLogin);
+    showLoginLink.addEventListener("keypress", e => {
+      if (e.key === "Enter" || e.key === " ") {
+        showLogin();
+        e.preventDefault();
+      }
+    });
+
+    // Register form submission
+    registerForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const username = registerForm.registerUsername.value.trim();
+      const password = registerForm.registerPassword.value;
+      const passwordConfirm = registerForm.registerPasswordConfirm.value;
+
+      const users = getUsers();
+
+      if (username.length < 3) {
+        registerErrorMsg.textContent = "Username minimal 3 karakter.";
+        registerForm.registerUsername.focus();
+        return;
+      }
+
+      if (users[username]) {
+        registerErrorMsg.textContent = "Username sudah terdaftar. Silakan pilih username lain.";
+        registerForm.registerUsername.focus();
+        return;
+      }
+
+      if (!isPasswordStrong(password)) {
+        registerErrorMsg.textContent = "Password minimal 6 karakter.";
+        registerForm.registerPassword.focus();
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        registerErrorMsg.textContent = "Password konfirmasi tidak cocok.";
+        registerForm.registerPasswordConfirm.focus();
+        return;
+      }
+
+      // Save new user
+      users[username] = { password: password };
+      saveUsers(users);
+
+      registerErrorMsg.textContent = "";
+      alert("Pendaftaran berhasil! Silakan login.");
+      registerForm.reset();
+      showLogin();
+    });
+
+    // Login form submission
+    loginForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const username = loginForm.loginUsername.value.trim();
+      const password = loginForm.loginPassword.value;
+
+      const users = getUsers();
+
+      if (!users[username]) {
+        loginErrorMsg.textContent = "Username tidak ditemukan.";
+        loginForm.loginUsername.focus();
+        return;
+      }
+
+      if (users[username].password !== password) {
+        loginErrorMsg.textContent = "Password salah. Silakan coba lagi.";
+        loginForm.loginPassword.value = "";
+        loginForm.loginPassword.focus();
+        return;
+      }
+
+      loginErrorMsg.textContent = "";
+      sessionStorage.setItem("bucinUser", username);
+      loginForm.reset();
+      showDashboard(username);
+    });
+
+    // Logout button action
+    logoutBtn.addEventListener("click", () => {
+      sessionStorage.removeItem("bucinUser");
+      showLogin();
+    });
+  })();
+</script>
+
+</body>
+</html>
